@@ -11,6 +11,8 @@ body {
 
 div {
   display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
 canvas {
@@ -21,4 +23,5 @@ canvas {
 }
 .axis-input {
   margin: 15px;
+  width: 20%;
 }
