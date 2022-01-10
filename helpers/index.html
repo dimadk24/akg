@@ -132,7 +132,7 @@
 
         renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setClearColor(bgColor, 1);
-        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setPixelRatio(window.devicePixelRatio*2);
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
