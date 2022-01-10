@@ -17,26 +17,27 @@
         </div>
         <div class="axis-input">
             <p class="input-title">поворот фигуры Y</p>
-            <input type="range" name="pyramidY" id="pyramidY" min="0" max="360" step="0.5" value="0" />
+            <input type="range" name="pyramidY" id="pyramidY" min="0" max="360" step="0.5" value="24" />
         </div>
         <div class="axis-input">
             <p class="input-title">поворот фигуры Z</p>
-            <input type="range" name="pyramidX" id="pyramidX" min="0" max="360" step="0.5" value="88" />
+            <input type="range" name="pyramidX" id="pyramidX" min="0" max="360" step="0.5" value="71" />
         </div>
         <div class="axis-input">
             <p class="input-title">дистанция от точки наблюдения</p>
-            <input type="range" name="pyramidX" id="cameraX" min="0" max="1500" step="0.5" value="640" />
+            <input type="range" name="pyramidX" id="cameraX" min="0" max="1500" step="0.5" value="0" />
         </div>
     </div>
 </body>
 <script src="three.js"></script>
-<script>
+<script type="module">
+    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/controls/OrbitControls.js';
     const spread = 15;
     const objects = [];
     const cameraPos = {
-        x: 700,
-        y: 1000,
-        z: 700
+        x: 0.0010666516832633427,
+        y: 1407.1247279463041,
+        z: 0.000917744074669381,
     };
 
     var tanFov, windowHeight;
@@ -70,10 +71,11 @@
         const axesHelper = new THREE.AxesHelper(axisHeight / 2);
 
         // scene.add(axesHelper);
+        return camera;
     }
 
     function init() {
-        initCamera();
+        const camera = initCamera();
 
         const height = 50;
         const smallObjectHeight = height * 1.5;
@@ -94,7 +96,7 @@
         smallObjectShape.lineTo(-smallObjectHeight, -smallObjectHeight);
 
         const extrudeSettings = {
-            amount: height+100,
+            amount: height+200,
             bevelEnabled: false,
             steps: 2,
         };
@@ -134,6 +136,8 @@
         renderer.setClearColor(bgColor, 1);
         renderer.setPixelRatio(window.devicePixelRatio*2);
         renderer.setSize(window.innerWidth, window.innerHeight);
+        const controls = new OrbitControls( camera, renderer.domElement);
+        controls.update();
         document.body.appendChild(renderer.domElement);
 
         tanFov = Math.tan(((Math.PI / 180) * (camera.fov / 2)));
@@ -162,6 +166,7 @@
                 ? (pyramidZ * Math.PI) / 180
                 : objects[i].rotation.z + 0.01;
         }
+        // console.log(camera.position)
 
         camera.position.x = cameraPos.x - cameraX / 2;
         camera.position.y = cameraPos.y - cameraX / 2;
