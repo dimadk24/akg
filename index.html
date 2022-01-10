@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>КР</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <div class="axis-inputs">
+        <div class="axis-input">
+            <p class="input-title">поворот фигуры X</p>
+            <input type="range" name="pyramidZ" id="pyramidZ" min="0" max="360" step="0.5" value="0" />
+        </div>
+        <div class="axis-input">
+            <p class="input-title">поворот фигуры Y</p>
+            <input type="range" name="pyramidY" id="pyramidY" min="0" max="360" step="0.5" value="14.5" />
+        </div>
+        <div class="axis-input">
+            <p class="input-title">поворот фигуры Z</p>
+            <input type="range" name="pyramidX" id="pyramidX" min="0" max="360" step="0.5" value="74.5" />
+        </div>
+        <div class="axis-input">
+            <p class="input-title">дистанция от точки наблюдения</p>
+            <input type="range" name="pyramidX" id="cameraX" min="0" max="1500" step="0.5" value="640" />
+        </div>
+    </div>
+</body>
+<script src="three.js"></script>
+<script>
+    const spread = 15;
+    const objects = [];
+    const cameraPos = {
+        x: 700,
+        y: 1000,
+        z: 700
+    };
+
+    var tanFov, windowHeight;
+
+    const axisHeight = 800;
+
+    let rotation = 0;
+
+    const angle = Math.PI / 3;
+
+    const axis = new THREE.Vector3(-0.5, 1, 0);
+
+    const bgColor = 0x000000;
+
+    const lineColor = 0x000000;
+
+    let camera, renderer;
+    const dash = 1;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xffffff);
+
+    function initCamera() {
+        camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 2500);
+        camera.position.z = cameraPos.z;
+        camera.position.y = cameraPos.y;
+        camera.position.x = cameraPos.x;
+
+        camera.lookAt(scene.position);
+
+        const axesHelper = new THREE.AxesHelper(axisHeight / 2);
+
+        // scene.add(axesHelper);
+    }
+
+    function init() {
+        initCamera();
+
+        const height = 50;
+        const smallObjectHeight = height * 1.5;
+        const bigObjectHeight = 3 * smallObjectHeight;
+
+        var bigObjectShape = new THREE.Shape();
+        bigObjectShape.moveTo(-bigObjectHeight, -bigObjectHeight);
+        bigObjectShape.lineTo(-bigObjectHeight, bigObjectHeight);
+        bigObjectShape.lineTo(bigObjectHeight, bigObjectHeight);
+        bigObjectShape.lineTo(bigObjectHeight, -bigObjectHeight);
+        bigObjectShape.lineTo(-bigObjectHeight, -bigObjectHeight);
+
+        var smallObjectShape = new THREE.Shape();
+        smallObjectShape.moveTo(-smallObjectHeight, -smallObjectHeight);
+        smallObjectShape.lineTo(-smallObjectHeight, smallObjectHeight);
+        smallObjectShape.lineTo(smallObjectHeight, smallObjectHeight);
+        smallObjectShape.lineTo(smallObjectHeight, -smallObjectHeight);
+        smallObjectShape.lineTo(-smallObjectHeight, -smallObjectHeight);
+
+        const extrudeSettings = {
+            amount: height,
+            bevelEnabled: false,
+            steps: 2,
+        };
+
+        bigObjectShape.holes.push(smallObjectShape)
+
+        const bigObjectGeometry = new THREE.ExtrudeBufferGeometry(bigObjectShape, extrudeSettings);
+        const smallObjectGeometry = new THREE.ExtrudeBufferGeometry(smallObjectShape, extrudeSettings);
+        let edges1 = new THREE.EdgesGeometry(bigObjectGeometry);
+        let edges2 = new THREE.EdgesGeometry(smallObjectGeometry);
+
+        var lineMaterial = new THREE.LineBasicMaterial({
+            color: 'black',
+            linewidth: 2,
+        });
+
+        const edgesMesh1 = new THREE.LineSegments(edges1, lineMaterial);
+        const edgesMesh2 = new THREE.LineSegments(edges2, lineMaterial);
+
+        const bigObjectMaterial = new THREE.MeshBasicMaterial({
+            color: 'white',
+        })
+        const bigObjectMesh = new THREE.Mesh(bigObjectGeometry, bigObjectMaterial)
+
+        scene.add(edgesMesh1);
+        scene.add(edgesMesh2);
+        scene.add(bigObjectMesh);
+        objects[1] = edgesMesh1;
+        objects[2] = edgesMesh2;
+        objects[3] = bigObjectMesh;
+
+        const light = new THREE.HemisphereLight(0xfffff0, 0x101020, 1.25);
+        light.position.set(0.75, 1, 0.25);
+        scene.add(light);
+
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setClearColor(bgColor, 1);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        tanFov = Math.tan(((Math.PI / 180) * (camera.fov / 2)));
+        windowHeight = window.innerHeight;
+
+        window.addEventListener('resize', onWindowResize, false);
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        const pyramidAuto = false;
+        const pyramidX = document.getElementById("pyramidX").value;
+        const pyramidY = document.getElementById("pyramidY").value;
+        const pyramidZ = document.getElementById("pyramidZ").value;
+        const cameraX = document.getElementById("cameraX").value;
+
+        for (let i = 0; i < objects.length; i++) {
+            if (!objects[i]) continue;
+            objects[i].rotation.x = !pyramidAuto
+                ? (pyramidX * Math.PI) / 180
+                : objects[i].rotation.x + 0.01;
+            objects[i].rotation.y = !pyramidAuto
+                ? (pyramidY * Math.PI) / 180
+                : objects[i].rotation.y + 0.01;
+            objects[i].rotation.z = !pyramidAuto
+                ? (pyramidZ * Math.PI) / 180
+                : objects[i].rotation.z + 0.01;
+        }
+
+        camera.position.x = cameraPos.x - cameraX / 2;
+        camera.position.y = cameraPos.y - cameraX / 2;
+        camera.position.z = cameraPos.z - cameraX / 2;
+
+        renderer.render(scene, camera);
+    }
+
+    init();
+    animate();
+
+    function onWindowResize(event) {
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.fov = (360 / Math.PI) * Math.atan(tanFov * (window.innerHeight / windowHeight));
+
+        camera.updateProjectionMatrix();
+        camera.lookAt(scene.position);
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        renderer.render(scene, camera);
+    }
+</script>
+
+</html>

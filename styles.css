@@ -1,0 +1,23 @@
+body {
+  overflow: hidden;
+  /*background-color: #ffffff;*/
+}
+
+* {
+  padding: 0;
+  margin: 0;
+}
+
+div {
+  display: flex;
+}
+
+canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: -1;
+}
+.axis-input {
+  margin: 15px;
+}
