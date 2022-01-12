@@ -29,7 +29,7 @@
         </div>
     </div>
 </body>
-<script src="three.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script type="module">
     import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/controls/OrbitControls.js';
     const spread = 15;
@@ -96,7 +96,7 @@
         smallObjectShape.lineTo(-smallObjectHeight, -smallObjectHeight);
 
         const extrudeSettings = {
-            amount: height+200,
+            depth: height+200,
             bevelEnabled: false,
             steps: 2,
         };
@@ -110,7 +110,7 @@
 
         var lineMaterial = new THREE.LineBasicMaterial({
             color: 'black',
-            linewidth: 2,
+            linewidth: 2.5,
         });
 
         const edgesMesh1 = new THREE.LineSegments(edges1, lineMaterial);
@@ -120,19 +120,34 @@
             color: 'white',
         })
         const bigObjectMesh = new THREE.Mesh(bigObjectGeometry, bigObjectMaterial)
+        const hiddenDashedMesh = new THREE.LineSegments(edges1, new THREE.LineDashedMaterial({
+            color: 'black',
+            linewidth: 0.2,
+            scale: 1,
+            dashSize: 15,
+            gapSize: 15,
+        }))
+        hiddenDashedMesh.computeLineDistances()
+
+        bigObjectMesh.renderOrder = 1;
+        hiddenDashedMesh.renderOrder = 2;
+        hiddenDashedMesh.onBeforeRender = function( renderer ) { renderer.clearDepth(); };
 
         scene.add(edgesMesh1);
         scene.add(edgesMesh2);
         scene.add(bigObjectMesh);
+        scene.add(hiddenDashedMesh);
         objects[1] = edgesMesh1;
         objects[2] = edgesMesh2;
         objects[3] = bigObjectMesh;
+        objects[4] = hiddenDashedMesh;
 
         const light = new THREE.HemisphereLight(0xfffff0, 0x101020, 1.25);
         light.position.set(0.75, 1, 0.25);
         scene.add(light);
 
         renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.sortObjects = false;
         renderer.setClearColor(bgColor, 1);
         renderer.setPixelRatio(window.devicePixelRatio*2);
         renderer.setSize(window.innerWidth, window.innerHeight);
