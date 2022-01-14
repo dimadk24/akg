@@ -12,19 +12,19 @@
 <body>
     <div class="axis-inputs">
         <div class="axis-input">
-            <p class="input-title">поворот фигуры X</p>
-            <input type="range" name="pyramidZ" id="pyramidZ" min="0" max="360" step="0.5" value="162" />
+            <p class="input-title">X</p>
+            <input type="range" name="pyramidZ" id="pyramidZ" min="0" max="360" step="0.5" value="178" />
         </div>
         <div class="axis-input">
-            <p class="input-title">поворот фигуры Y</p>
-            <input type="range" name="pyramidY" id="pyramidY" min="0" max="360" step="0.5" value="26.5" />
+            <p class="input-title">Y</p>
+            <input type="range" name="pyramidY" id="pyramidY" min="0" max="360" step="0.5" value="12.5" />
         </div>
         <div class="axis-input">
-            <p class="input-title">поворот фигуры Z</p>
-            <input type="range" name="pyramidX" id="pyramidX" min="0" max="360" step="0.5" value="64" />
+            <p class="input-title">Z</p>
+            <input type="range" name="pyramidX" id="pyramidX" min="0" max="360" step="0.5" value="81" />
         </div>
         <div class="axis-input">
-            <p class="input-title">дистанция от точки наблюдения</p>
+            <p class="input-title">Расстояние от камеры</p>
             <input type="range" name="pyramidX" id="cameraX" min="0" max="1500" step="0.5" value="99.5" />
         </div>
     </div>
@@ -58,7 +58,7 @@
     const dash = 1;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xffffff);
+    scene.background = new THREE.Color(0xe9e9e9);
 
     function initCamera() {
         camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 2500);
@@ -82,11 +82,11 @@
         const bigObjectHeight = 3 * smallObjectHeight;
 
         var bigObjectShape = new THREE.Shape();
-        bigObjectShape.moveTo(-bigObjectHeight-100, -bigObjectHeight);
-        bigObjectShape.lineTo(-bigObjectHeight-100, bigObjectHeight);
+        bigObjectShape.moveTo(-bigObjectHeight, -bigObjectHeight);
+        bigObjectShape.lineTo(-bigObjectHeight, bigObjectHeight);
         bigObjectShape.lineTo(bigObjectHeight, bigObjectHeight);
         bigObjectShape.lineTo(bigObjectHeight, -bigObjectHeight);
-        bigObjectShape.lineTo(-bigObjectHeight-100, -bigObjectHeight);
+        bigObjectShape.lineTo(-bigObjectHeight, -bigObjectHeight);
 
         var smallObjectShape = new THREE.Shape();
         smallObjectShape.moveTo(-smallObjectHeight, -smallObjectHeight);
@@ -110,7 +110,7 @@
 
         var lineMaterial = new THREE.LineBasicMaterial({
             color: 'black',
-            linewidth: 2.5,
+            linewidth: 1,
         });
 
         const edgesMesh1 = new THREE.LineSegments(edges1, lineMaterial);
