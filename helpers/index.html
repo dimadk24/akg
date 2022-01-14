@@ -13,19 +13,19 @@
     <div class="axis-inputs">
         <div class="axis-input">
             <p class="input-title">поворот фигуры X</p>
-            <input type="range" name="pyramidZ" id="pyramidZ" min="0" max="360" step="0.5" value="162" />
+            <input type="range" name="pyramidZ" id="pyramidZ" min="0" max="360" step="0.5" value="148" />
         </div>
         <div class="axis-input">
             <p class="input-title">поворот фигуры Y</p>
-            <input type="range" name="pyramidY" id="pyramidY" min="0" max="360" step="0.5" value="26.5" />
+            <input type="range" name="pyramidY" id="pyramidY" min="0" max="360" step="0.5" value="21" />
         </div>
         <div class="axis-input">
             <p class="input-title">поворот фигуры Z</p>
-            <input type="range" name="pyramidX" id="pyramidX" min="0" max="360" step="0.5" value="64" />
+            <input type="range" name="pyramidX" id="pyramidX" min="0" max="360" step="0.5" value="69" />
         </div>
         <div class="axis-input">
             <p class="input-title">дистанция от точки наблюдения</p>
-            <input type="range" name="pyramidX" id="cameraX" min="0" max="1500" step="0.5" value="99.5" />
+            <input type="range" name="pyramidX" id="cameraX" min="0" max="1500" step="0.5" value="0" />
         </div>
     </div>
 </body>
@@ -35,9 +35,9 @@
     const spread = 15;
     const objects = [];
     const cameraPos = {
-        x: 676.2444674043508,
-        y: 1046.3492409994858,
-        z: 654.0999053392086,
+        x: 3.674288453715963,
+        y: 4.630468404680813,
+        z: 3.613636217460512,
     };
 
     var tanFov, windowHeight;
@@ -61,7 +61,25 @@
     scene.background = new THREE.Color(0xffffff);
 
     function initCamera() {
-        camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 2500);
+        var left = -3.4,
+            right = 3.4,
+            top = 3.4,
+            bottom = -3.4,
+            near = 0.01,
+            far = 100;
+            camera = new THREE.OrthographicCamera(
+                left,
+                right,
+                top,
+                bottom,
+                near,
+                far);
+        camera.position.set(4, 4, 4);
+        camera.lookAt(0, 0, 0);
+        camera.zoom = 2;
+        camera.updateProjectionMatrix();
+        // camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 2500);
+        // camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 1000 );
         camera.position.z = cameraPos.z;
         camera.position.y = cameraPos.y;
         camera.position.x = cameraPos.x;
@@ -103,7 +121,7 @@
 
         // bigObjectShape.holes.push(smallObjectShape)
 
-        const bigObjectGeometry = new THREE.ExtrudeBufferGeometry(bigObjectShape, extrudeSettings);
+        const bigObjectGeometry = new THREE.BoxGeometry(0.9, 1, 0.5)
         // const smallObjectGeometry = new THREE.ExtrudeBufferGeometry(smallObjectShape, extrudeSettings);
         let edges1 = new THREE.EdgesGeometry(bigObjectGeometry);
         // let edges2 = new THREE.EdgesGeometry(smallObjectGeometry);
@@ -124,14 +142,24 @@
             color: 'black',
             linewidth: 0.2,
             scale: 1,
-            dashSize: 50,
-            gapSize: 40,
+            dashSize: 0.15,
+            gapSize: 0.07,
         }))
         hiddenDashedMesh.computeLineDistances()
 
         bigObjectMesh.renderOrder = 1;
         hiddenDashedMesh.renderOrder = 2;
         hiddenDashedMesh.onBeforeRender = function( renderer ) { renderer.clearDepth(); };
+
+        // scene.add(new THREE.GridHelper(10, 10));
+        // mesh
+        // var material0 = new THREE.MeshBasicMaterial({wireframe: true, wireframeLinewidth: 1, color: 'black' });
+        // let box = new THREE.Mesh(
+        //     new THREE.BoxGeometry(4, 1, 0.3),
+        //     material0);
+        // scene.add(box);
+        // objects[0] = box;
+        scene.add(camera)
 
         scene.add(edgesMesh1);
         // scene.add(edgesMesh2);
@@ -142,17 +170,17 @@
         objects[3] = bigObjectMesh;
         objects[4] = hiddenDashedMesh;
 
-        const light = new THREE.HemisphereLight(0xfffff0, 0x101020, 1.25);
-        light.position.set(0.75, 1, 0.25);
-        scene.add(light);
+        // const light = new THREE.HemisphereLight(0xfffff0, 0x101020, 1.25);
+        // light.position.set(0.75, 1, 0.25);
+        // scene.add(light);
 
         renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.sortObjects = false;
         renderer.setClearColor(bgColor, 1);
         renderer.setPixelRatio(window.devicePixelRatio*2);
         renderer.setSize(window.innerWidth, window.innerHeight);
-        // const controls = new OrbitControls( camera, renderer.domElement);
-        // controls.update();
+        const controls = new OrbitControls( camera, renderer.domElement);
+        controls.update();
         document.body.appendChild(renderer.domElement);
 
         tanFov = Math.tan(((Math.PI / 180) * (camera.fov / 2)));
@@ -183,9 +211,9 @@
         }
         // console.log(camera.position)
 
-        camera.position.x = cameraPos.x - cameraX / 2;
-        camera.position.y = cameraPos.y - cameraX / 2;
-        camera.position.z = cameraPos.z - cameraX / 2;
+        camera.position.x = cameraPos.x - cameraX;
+        camera.position.y = cameraPos.y - cameraX;
+        camera.position.z = cameraPos.z - cameraX ;
 
         renderer.render(scene, camera);
     }
